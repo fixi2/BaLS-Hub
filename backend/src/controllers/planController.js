@@ -13,13 +13,14 @@ exports.getPlans = async (req, res) => {
 
 // Create a plan
 exports.createPlan = async (req, res) => {
-  const { name, price, features, isPro } = req.body;
+  const { name, price, features, isPro, stripePlanId } = req.body;
   try {
     const newPlan = new Plan({
       name,
       price,
       features,
-      isPro
+      isPro,
+      stripePlanId
     });
 
     const plan = await newPlan.save();
@@ -32,20 +33,25 @@ exports.createPlan = async (req, res) => {
 
 // Update a plan
 exports.updatePlan = async (req, res) => {
-  const { name, price, features, isPro } = req.body;
+  const { name, price, features, isPro, stripePlanId } = req.body;
+
+  const planFields = {};
+  if (name) planFields.name = name;
+  if (price) planFields.price = price;
+  if (features) planFields.features = features;
+  if (isPro) planFields.isPro = isPro;
+  if (stripePlanId) planFields.stripePlanId = stripePlanId;
 
   try {
     let plan = await Plan.findById(req.params.id);
-    if (!plan) {
-      return res.status(404).json({ msg: 'Plan not found' });
-    }
 
-    plan.name = name;
-    plan.price = price;
-    plan.features = features;
-    plan.isPro = isPro;
+    if (!plan) return res.status(404).json({ msg: 'Plan not found' });
 
-    plan = await plan.save();
+    plan = await Plan.findByIdAndUpdate(
+      req.params.id,
+      { $set: planFields },
+      { new: true }
+    );
     res.json(plan);
   } catch (err) {
     console.error(err.message);

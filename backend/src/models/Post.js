@@ -16,8 +16,13 @@ const PostSchema = new Schema({
     required: true
   },
   author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  status: {
     type: String,
-    default: 'Admin'
+    enum: ['published', 'draft'],
+    default: 'draft'
   },
   date: {
     type: Date,

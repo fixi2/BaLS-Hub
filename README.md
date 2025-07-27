@@ -123,4 +123,31 @@ npm run dev
 - `POST /api/chat/bot` - Get a response from the chat bot.
 - `GET /api/posts`, `GET /api/docs`, `GET /api/plans` - Retrieve content.
 
-A WebSocket server is also running for the live chat at `/`. 
+A WebSocket server is also running for the live chat at `/`.
+
+---
+
+## Security
+
+This project has undergone a security audit and includes multiple layers of protection against common vulnerabilities:
+
+-   **Authentication & Session Management**:
+    -   JWT tokens have a limited lifespan (24 hours).
+    -   A token blacklist mechanism is implemented for secure logout.
+    -   Account lockout is in place to prevent targeted brute-force attacks.
+    -   Rate limiting is applied to authentication routes to prevent general brute-force attacks.
+
+-   **Data & API Security**:
+    -   **IDOR Protection**: Users can only modify resources they own.
+    -   **Mass Assignment Protection**: Controllers explicitly define which fields can be updated.
+    -   **Input Validation & Sanitization**: `express-validator` is used on all data-accepting endpoints to prevent DoS and other data-related attacks.
+    -   **Prototype Pollution & NoSQL Injection Protection**: `express-mongo-sanitize` is used globally.
+
+-   **Frontend Security**:
+    -   **XSS Protection**: `dompurify` is installed, and a `SECURITY_GUIDE.md` provides instructions for safe HTML rendering. All other inputs are sanitized on the backend.
+    -   **Secure Session Handling**: A global API client handles token expiration and automatically redirects to the login page.
+
+-   **Server Configuration**:
+    -   **Security Headers**: `helmet` is used to apply essential security headers.
+    -   **Strict CORS Policy**: A strict CORS policy is enforced in production.
+    -   **Error Handling**: A centralized error handler prevents information leakage. 
